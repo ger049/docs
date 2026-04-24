@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Flush existing rules
+ip6tables -F
+ip6tables -X
+ip6tables -Z
+
+# Default policies: DROP everything
+ip6tables -P INPUT DROP
+ip6tables -P FORWARD DROP
+ip6tables -P OUTPUT ACCEPT
+
+# Allow loopback interface
+ip6tables -A INPUT -i lo -j ACCEPT
+
+# Allow established/related connections
+ip6tables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow ICMPv6 (essential for IPv6 to work correctly!)
+ip6tables -A INPUT -p ipv6-icmp -j ACCEPT
+
+# Allow SSH (port 22)
+ip6tables -A INPUT -p tcp -s 2001:1c01:3609:7600:d04e:845:330d:3c0e --dport 22 -j ACCEPT
+
+# Allow RUG ipv6:
+ip6tables -A INPUT -p tcp -s 2001:610:1a09:dce:513::/96 -j ACCEPT
+
+# Log dropped packets (optional)
+ip6tables -A INPUT -j LOG --log-prefix "ip6tables-DROP: " --log-level 4
