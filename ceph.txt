@@ -1,0 +1,53 @@
+
+
+
+ceph stuff:
+
+create ceph fs:
+
+# ceph osd pool create rdms-poc_data
+# ceph osd pool create rdms-poc_metadata
+# ceph fs new rdms-poc rdms-poc_data rdms-poc_metadata
+
+mount ceph fs on client:
+
+# mount -t ceph ceph-osd-1:6789,ceph-osd-2:6789:/ /mnt/cephfs   -o name=admin,secret=$(ceph auth get-key client.admin)
+
+root@rdms-ceph-poc01:/etc/ceph# df -h
+Filesystem                                                               Size  Used Avail Use% Mounted on
+[2001:610:1a09:dce:513:0:2:1]:6789,[2001:610:1a09:dce:513:0:2:2]:6789:/  139T     0  139T   0% /mnt/cephfs
+
+(copy /etc/ceph/ceph.conf from cluster to client:/etc/ceph/ceph.conf) 
+
+remove ceph-fs:
+
+ceph: root@hb-ceph-mon01 /]# ceph fs ls
+name: test_volume, metadata pool: cephfs.test_volume.meta, data pools: [cephfs.test_volume.data ]
+name: rdms-poc, metadata pool: rdms-poc_data, data pools: [rdms-poc_metadata ]
+
+[ceph: root@hb-ceph-mon01 /]# ceph fs fail rdms-poc
+rdms-poc marked not joinable; MDS cannot join the cluster. All MDS ranks marked failed.
+
+[ceph: root@hb-ceph-mon01 /]# ceph fs set rdms-poc cluster_down true
+rdms-poc marked not joinable; MDS cannot join as newly active. WARNING: cluster_down flag is deprecated and will be removed in a future version. Please use "joinable".
+
+[ceph: root@hb-ceph-mon01 /]# ceph config set mon mon_allow_pool_delete true
+
+[ceph: root@hb-ceph-mon01 /]# ceph osd pool delete rdms-poc_metadata  rdms-poc_metadata --yes-i-really-really-mean-it
+pool 'rdms-poc_metadata' removed
+
+[ceph: root@hb-ceph-mon01 /]# ceph osd pool delete rdms-poc_data  rdms-poc_data --yes-i-really-really-mean-it
+pool 'rdms-poc_data' does not exist
+
+[ceph: root@hb-ceph-mon01 /]# ceph osd pool ls
+.mgr
+backups
+images
+volumes
+vms
+device_health_metrics
+volumes-ssd
+hdd-testing
+cephfs.test_volume.meta
+cephfs.test_volume.data
+
