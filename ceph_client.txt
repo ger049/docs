@@ -1,0 +1,24 @@
+cepfs-debian-client:
+
+root@test-client:/home/ger# apt install -y ceph-common
+
+get admin-key from cephfs:
+
+root@test-ceph:/# ceph auth get client.admin                            
+[client.admin]
+	key = <secret>
+	caps mds = "allow *"
+	caps mgr = "allow *"
+	caps mon = "allow *"
+	caps osd = "allow *"
+
+on client put admin-key in /etc/ceph/client.keyring
+on client put key to /etc/ceph/admin.secret
+
+chmod 600 etc/ceph/client.admin.keyring
+
+on ceph-server copy /etc/ceph/ceph.conf to client /etc/ceph/ceph.conf
+
+on client: 
+
+root@test-client:/etc/ceph# mount -t ceph test-ceph:6789:/ /mnt/cephfs -o name=admin,secretfile=/etc/ceph/admin.secret
