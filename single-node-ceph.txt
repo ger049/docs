@@ -1,0 +1,98 @@
+test-vm:
+
+- 4 cores
+- 8 GB RAM 
+- 1x 20 GB root
+- 3x 20 GB volume OSD
+- Ubuntu
+
+ssh ger@192.168.178.38
+
+single-node-ceph:
+
+install ceph-adm:
+
+apt install -y python3 curl
+apt install -y cephadm
+
+root@test-vm:/home/ger# cephadm install
+Installing packages ['cephadm']...
+
+bootstrap ceph:
+
+root@test-vm:/home/ger# cephadm bootstrap --mon-ip 192.168.178.38 --single-host-defaults
+
+Ceph Dashboard is now available at:
+
+	     URL: https://test-vm:8443/
+	    User: admin
+	Password: <secret> 
+
+Enabling client.admin keyring and conf on hosts with "admin" label
+Saving cluster configuration to /var/lib/ceph/53dd3911-406e-11f1-a560-bc2411952f4f/config directory
+You can access the Ceph CLI as following in case of multi-cluster or non-default config:
+
+	sudo /usr/sbin/cephadm shell --fsid 53dd3911-406e-11f1-a560-bc2411952f4f -c /etc/ceph/ceph.conf -k /etc/ceph/ceph.client.admin.keyring
+
+Or, if you are only running a single cluster on this host:
+
+	sudo /usr/sbin/cephadm shell 
+
+Please consider enabling telemetry to help improve Ceph:
+
+	ceph telemetry on
+
+For more information see:
+
+	https://docs.ceph.com/en/latest/mgr/telemetry/
+
+Bootstrap complete.
+
+create osd’s:
+
+root@test-vm:/home/ger# cephadm shell
+Inferring fsid 53dd3911-406e-11f1-a560-bc2411952f4f
+Inferring config /var/lib/ceph/53dd3911-406e-11f1-a560-bc2411952f4f/mon.test-vm/config
+Using ceph image with id 'af0c5903e901' and tag 'v19' created on 2025-07-17 19:53:27 +0000 UTC
+quay.io/ceph/ceph@sha256:af0c5903e901e329adabe219dfc8d0c3efc1f05102a753902f33ee16c26b6cee
+root@test-vm:/# ceph orch daemon add osd test-vm:/dev/sdb
+Created osd(s) 0 on host 'test-vm'
+root@test-vm:/# ceph orch daemon add osd test-vm:/dev/sdc
+Created osd(s) 1 on host 'test-vm'
+root@test-vm:/# ceph orch daemon add osd test-vm:/dev/sdd
+Created osd(s) 2 on host 'test-vm'
+
+create fs:
+
+root@test-vm:/# ceph fs volume create cephfs01
+
+check status:
+
+root@test-vm:/# ceph fs status
+cephfs01 - 0 clients
+========
+RANK  STATE             MDS               ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  cephfs01.test-vm.rdirkb  Reqs:    0 /s    10     13     12      0   
+        POOL            TYPE     USED  AVAIL  
+cephfs.cephfs01.meta  metadata  64.0k  28.4G  
+cephfs.cephfs01.data    data       0   28.4G  
+      STANDBY MDS        
+cephfs01.test-vm.jvodma  
+MDS version: ceph version 19.2.3 (c92aebb279828e9c3c1f5d24613efca272649e62) squid (stable)
+root@test-vm:/# ceph  status
+  cluster:
+    id:     53dd3911-406e-11f1-a560-bc2411952f4f
+    health: HEALTH_OK
+ 
+  services:
+    mon: 1 daemons, quorum test-vm (age 10m)
+    mgr: test-vm.rbpdhh(active, since 8m), standbys: test-vm.hdftyu
+    mds: 1/1 daemons up, 1 standby
+    osd: 3 osds: 3 up (since 2m), 3 in (since 3m)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   3 pools, 145 pgs
+    objects: 24 objects, 579 KiB
+    usage:   99 MiB used, 60 GiB / 60 GiB avail
+    pgs:     145 active+clean
