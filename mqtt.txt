@@ -1,0 +1,15 @@
+install/configure MQTT broker on a debian12-vm:
+
+ # apt install mosquitto mosquitto-clients -y
+ # systemctl enable mosquitto
+ # systemctl start mosquitto
+ # vi /etc/mosquitto/conf.d/default.conf
+ # systemctl restart mosquitto
+ $ mosquitto_sub -h localhost -t test/topic
+ # mosquitto_passwd -c /etc/mosquitto/passwd ger
+ # chown mosquitto:mosquitto /etc/mosquitto/passwd 
+ # systemctl start mosquitto
+ # mosquitto_passwd -c /etc/mosquitto/passwd plug01
+ # systemctl restart mosquitto
+
+
