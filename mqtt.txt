@@ -12,4 +12,14 @@ install/configure MQTT broker on a debian12-vm:
  # mosquitto_passwd -c /etc/mosquitto/passwd plug01
  # systemctl restart mosquitto
 
+On tasmota-plug configure:
+
+MQTT host: 192.168.178.213
+MQTT user: plug01
+MQTT pass: <secret>
+
+test:
+
+ger@test-client:~/tasmota$ mosquitto_pub -h 192.168.178.213 -t "cmnd/plug01/Power" -m "ON"
+ger@test-client:~/tasmota$ mosquitto_pub -h 192.168.178.213 -t "cmnd/plug01/Power" -m "OFF"
 
