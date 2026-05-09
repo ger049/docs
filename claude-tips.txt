@@ -1,0 +1,40 @@
+1. prevent claude from reading .env files:
+
+install node: brew install node
+
+add to .claude/setting.json:
+
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          { "type": "command", "command": "node /Users/gerstrikwerda/.claude/hooks/read_hook.js" }
+        ]
+      }
+    ]
+  }
+}
+
+create /Users/gerstrikwerda/.claude/hooks/read_hook.js:
+
+process.stdin.setEncoding("utf8");
+let input = "";
+process.stdin.on("data", (d) => (input += d));
+process.stdin.on("end", () => {
+  const toolArgs = JSON.parse(input);
+  const readPath = toolArgs.tool_input?.file_path || "";
+  if (readPath.includes(".env")) {
+    console.error("You cannot read the .env file");
+    process.exit(2);
+  }
+  process.exit(0);
+});
+
+check with claude:
+
+read .env file results in:
+
+A hook in your Claude Code configuration is blocking reads of .env files. This is a security measure — .env files often 
+  contain secrets like API keys and passwords.
