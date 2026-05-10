@@ -529,14 +529,21 @@
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "selected": true,
+          "text": ["/mnt/irods0", "/mnt/irods1"],
+          "value": ["/mnt/irods0", "/mnt/irods1"]
+        },
         "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
         "definition": "label_values(cephfs_mount_up, mountpoint)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "mountpoint",
-        "options": [],
+        "options": [
+          { "selected": true, "text": "/mnt/irods0", "value": "/mnt/irods0" },
+          { "selected": true, "text": "/mnt/irods1", "value": "/mnt/irods1" }
+        ],
         "query": {
           "query": "label_values(cephfs_mount_up, mountpoint)",
           "refId": "StandardVariableQuery"

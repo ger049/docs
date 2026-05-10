@@ -1,0 +1,30 @@
+# 1. Copy the script and unit file                                                                                      
+  sudo cp cephfs_exporter.py /opt/storage-exporter/                                                                       
+  sudo cp cephfs_exporter.service /etc/systemd/system/                                                                    
+                                                                                                                          
+  # 2. Reload systemd and enable/start                                                                                    
+  sudo systemctl daemon-reload                                                                                          
+  sudo systemctl enable --now cephfs_exporter                                                                           
+
+  # 3. Check status / logs                                                                                                
+  systemctl status cephfs_exporter
+  journalctl -u cephfs_exporter -f                                                                                        
+                                                                                                                        
+  Things to adjust before deploying:                                                                                      
+   
+  ┌───────────────────────┬────────────────────────┬─────────────────────────────────────────┐                            
+  │        Setting        │     Current value      │               Change if…                │                          
+  ├───────────────────────┼────────────────────────┼─────────────────────────────────────────┤                            
+  │ User/Group            │ prometheus             │ you want to run as a different user     │
+  ├───────────────────────┼────────────────────────┼─────────────────────────────────────────┤                            
+  │ ExecStart python path │ /usr/bin/python3       │ your venv or system python is elsewhere │                          
+  ├───────────────────────┼────────────────────────┼─────────────────────────────────────────┤                            
+  │ Script path           │ /opt/storage-exporter/ │ you deploy to a different directory     │
+  ├───────────────────────┼────────────────────────┼─────────────────────────────────────────┤                            
+  │ --mountpoint          │ /mnt/cephfs            │ your CephFS is mounted elsewhere        │                          
+  ├───────────────────────┼────────────────────────┼─────────────────────────────────────────┤                            
+  │ --port                │ 9857                   │ you need a different metrics port       │                          
+  └───────────────────────┴────────────────────────┴─────────────────────────────────────────┘                            
+                                                                                                                        
+  The Wants=remote-fs.target / After=remote-fs.target dependency ensures systemd waits for network filesystems to mount   
+  before starting the exporter.

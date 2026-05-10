@@ -48,7 +48,12 @@ def collect(mountpoint: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Prometheus exporter for CephFS disk usage")
-    parser.add_argument("--mountpoint", default="/mnt/cephfs", help="CephFS mountpoint to monitor")
+    parser.add_argument(
+        "--mountpoint",
+        nargs="+",
+        default=["/mnt/cephfs", "/mnt/irods0", "/mnt/irods1"],
+        help="Mountpoint(s) to monitor (space-separated)",
+    )
     parser.add_argument("--port", type=int, default=9857, help="Port to expose metrics on")
     parser.add_argument("--interval", type=int, default=60, help="Scrape interval in seconds")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
@@ -65,7 +70,8 @@ def main() -> None:
     log.info("Exporter started on :%d — monitoring %s every %ds", args.port, args.mountpoint, args.interval)
 
     while True:
-        collect(args.mountpoint)
+        for mp in args.mountpoint:
+            collect(mp)
         time.sleep(args.interval)
 
 

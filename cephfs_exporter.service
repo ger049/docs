@@ -1,0 +1,18 @@
+[Unit]
+Description=CephFS Prometheus Exporter
+After=network.target remote-fs.target
+Wants=remote-fs.target
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecStart=/usr/bin/python3 /opt/storage-exporter/cephfs_exporter.py \
+    --mountpoint /mnt/cephfs \
+    --port 9857 \
+    --interval 60
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
