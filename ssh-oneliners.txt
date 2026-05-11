@@ -1,0 +1,7 @@
+tunnel pooortje 9857 op 145.100.233.30 naar localhost:9857
+
+ssh -N -L 9857:127.0.0.1:9857 ger@145.100.233.30
+
+ssh vanaf een ipv4-bak via een ipv4-bak naar een ipv6-bakje
+
+ssh -J 172.23.51.129 2001:610:1a09:dce:513::2:0
