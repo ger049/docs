@@ -1,0 +1,10 @@
+iozone can be used for filesystem benchmarking:
+
+iozone -r 128k -i 0 -i 1 -i 2 -t 24 -s 10G
+where:
+• -r 128K: is used to specify the record size at 128 Kbytes;
+• -i 0 -i 1 -i 2: is used to specify which tests to run: 0=write/rewrite, 1=read/re-read,
+2=random-read/write;
+• -t 24 (or 36): is used to specify the number of concurrent threads or processes to have
+active during the measurement at 24 (or 36);
+• -s 10G: is used to specify the size of the file to test at 10GBytes.
