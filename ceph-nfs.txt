@@ -1,0 +1,86 @@
+ceph-nfs:
+
+share a cephfs over nfs using the ceph-nfs-server:
+
+root@test-ceph:/home/ger# cephadm shell
+Inferring fsid 76623c89-407e-11f1-8b9f-bc2411e1209d
+Inferring config /var/lib/ceph/76623c89-407e-11f1-8b9f-bc2411e1209d/mon.test-ceph/config
+Using ceph image with id 'af0c5903e901' and tag 'v19' created on 2025-07-17 21:53:27 +0200 CEST
+quay.io/ceph/ceph@sha256:af0c5903e901e329adabe219dfc8d0c3efc1f05102a753902f33ee16c26b6cee
+
+root@test-ceph:/# hostname
+test-ceph
+
+step 1: enable nfs module in Ceph if not already enabled:
+
+root@test-ceph:/# ceph mgr module enable nfs
+module 'nfs' is already enabled
+
+step 2: create ceph-nfs-cluster:
+
+root@test-ceph:/# ceph nfs cluster create ceph-nfs01 test-ceph
+
+step 3: check cephfs available:
+
+root@test-ceph:/# ceph fs status
+cephfs01 - 1 clients
+========
+RANK  STATE              MDS                ACTIVITY     DNS    INOS   DIRS   CAPS  
+ 0    active  cephfs01.test-ceph.ipvxjn  Reqs:    0 /s  99.8k  99.8k  6154      3   
+        POOL            TYPE     USED  AVAIL  
+cephfs.cephfs01.meta  metadata   378M  23.5G  
+cephfs.cephfs01.data    data    5948M  23.5G  
+       STANDBY MDS         
+cephfs01.test-ceph.jyatqb  
+MDS version: ceph version 19.2.3 (c92aebb279828e9c3c1f5d24613efca272649e62) squid (stable)
+
+step 4: create NFS export of cephfs
+ 
+root@test-ceph:/# ceph nfs export create cephfs --cluster-id ceph-nfs01 --pseudo-path /export --fsname cephfs01 --path /
+{
+  "bind": "/export",
+  "cluster": "ceph-nfs01",
+  "fs": "cephfs01",
+  "mode": "RW",
+  "path": "/"
+}
+
+step 5: check:
+
+root@test-ceph:/# ceph nfs export ls --cluster-id ceph-nfs01
+[
+  "/export"
+]
+
+step 6: extra check:
+
+root@test-ceph:/# ceph nfs export info --cluster-id ceph-nfs01 --pseudo-path /export
+{
+  "access_type": "RW",
+  "clients": [],
+  "cluster_id": "ceph-nfs01",
+  "export_id": 1,
+  "fsal": {
+    "cmount_path": "/",
+    "fs_name": "cephfs01",
+    "name": "CEPH",
+    "user_id": "nfs.ceph-nfs01.cephfs01.22834699"
+  },
+  "path": "/",
+  "protocols": [
+    4
+  ],
+  "pseudo": "/export",
+  "security_label": true,
+  "squash": "none",
+  "transports": [
+    "TCP"
+  ]
+}
+
+step 7: NFS mount on client:
+
+root@test-client:/home/ger# mount -t nfs4 test-ceph:/export /nfs
+root@test-client:/home/ger# df -h
+Filesystem              Size  Used Avail Use% Mounted on
+test-ceph:/export        27G  2.7G   24G  11% /nfs
