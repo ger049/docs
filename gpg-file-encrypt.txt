@@ -1,0 +1,7 @@
+encrypt file:
+
+$ gpg --symmetric --cipher-algo AES256 —armor file.txt
+
+decrypt file:
+
+$ gpg --decrypt file.txt.gpg > file.txt
