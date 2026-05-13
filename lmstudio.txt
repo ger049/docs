@@ -54,3 +54,20 @@ Success! Server is now running on port 4000
 
 $ socat TCP4-LISTEN:4001, fork, reuseaddr TCP4:127.0.0.1:4000
 lmstudio is now available at http://test-client:4001
+
+zed settings.json:
+
+  "agent": {
+    "default_model": {
+      "provider": "lmstudio",
+      "model": "qwen/qwen3-vl-4b",
+    },
+  },
+  "git_panel": {
+    "dock": "left",
+  },
+  "language_models": {
+    "lmstudio": {
+      "api_url": "http://test-client:4001/api/v0",
+    },
+  },
