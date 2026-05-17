@@ -1,0 +1,45 @@
+ceph 1 failed daemon:
+
+root@test-ceph:/home/ger# cephadm shell
+
+root@test-ceph:/# ceph -s
+ 
+  cluster:
+    id:     76623c89-407e-11f1-8b9f-bc2411e1209d
+    health: HEALTH_WARN
+            1 failed cephadm daemon(s)
+ 
+  services:
+    mon: 1 daemons, quorum test-ceph (age 16h)
+    mgr: test-ceph.lizbah(active, since 16h), standbys: test-ceph.xisjzf
+    mds: 1/1 daemons up, 1 standby
+    osd: 3 osds: 3 up (since 16h), 3 in (since 2w)
+    rgw: 1 daemon active (1 hosts, 1 zones)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   8 pools, 305 pgs
+    objects: 99.69k objects, 6.9 GiB
+    usage:   15 GiB used, 45 GiB / 60 GiB avail
+    pgs:     305 active+clean
+ 
+
+root@test-ceph:/# ceph health detail
+HEALTH_WARN 1 failed cephadm daemon(s)
+[WRN] CEPHADM_FAILED_DAEMON: 1 failed cephadm daemon(s)
+    daemon nfs.ceph-nfs01.0.0.test-ceph.ewntyv on test-ceph is in unknown state
+
+
+<fixed /etc/hosts>
+
+root@test-ceph:/# ceph orch daemon redeploy nfs.ceph-nfs01.0.0.test-ceph.ewntyv
+Scheduled to redeploy nfs.ceph-nfs01.0.0.test-ceph.ewntyv on host 'test-ceph'
+
+root@test-ceph:/# ceph health detail
+HEALTH_WARN 1 failed cephadm daemon(s)
+[WRN] CEPHADM_FAILED_DAEMON: 1 failed cephadm daemon(s)
+    daemon nfs.ceph-nfs01.0.0.test-ceph.ewntyv on test-ceph is in unknown state
+root@test-ceph:/# ceph -s
+  cluster:
+    id:     76623c89-407e-11f1-8b9f-bc2411e1209d
+    health: HEALTH_OK
