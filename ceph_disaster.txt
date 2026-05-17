@@ -1,0 +1,172 @@
+
+howto add extra disks to ceph:
+
+(3 extra schijven aan de vm gekoppeld op proxmox)
+
+root@test-ceph:/# ceph orch device ls 
+HOST       PATH      TYPE  DEVICE ID                   SIZE  AVAILABLE  REFRESHED  REJECT REASONS                                                           
+test-ceph  /dev/sda  hdd   QEMU_HARDDISK_drive-scsi6  20.0G  Yes        20m ago                                                                             
+test-ceph  /dev/sdc  hdd   QEMU_HARDDISK_drive-scsi5  20.0G  Yes        20m ago                                                                             
+test-ceph  /dev/sdd  hdd   QEMU_HARDDISK_drive-scsi4  20.0G  No         20m ago    Has a FileSystem, Insufficient space (<10 extents) on vgs, LVM detected  
+test-ceph  /dev/sde  hdd   QEMU_HARDDISK_drive-scsi3  20.0G  No         20m ago    Has a FileSystem, Insufficient space (<10 extents) on vgs, LVM detected  
+test-ceph  /dev/sdf  hdd   QEMU_HARDDISK_drive-scsi2  20.0G  No         20m ago    Has a FileSystem, Insufficient space (<10 extents) on vgs, LVM detected  
+test-ceph  /dev/sdg  hdd   QEMU_HARDDISK_drive-scsi1  20.0G  No         20m ago    Has a FileSystem, Insufficient space (<10 extents) on vgs, LVM detected  
+test-ceph  /dev/sr0  hdd   QEMU_DVD-ROM_QM00003       4096k  No         20m ago    Has a FileSystem, Insufficient space (<5GB)                              
+
+root@test-ceph:/# ceph orch apply osd --all-available-devices
+Scheduled osd.all-available-devices update...
+
+root@test-ceph:/# ceph -s
+  cluster:
+    id:     76623c89-407e-11f1-8b9f-bc2411e1209d
+    health: HEALTH_WARN
+            Degraded data redundancy: 260/199574 objects degraded (0.130%), 9 pgs degraded
+ 
+  services:
+    mon: 1 daemons, quorum test-ceph (age 25m)
+    mgr: test-ceph.lizbah(active, since 25m), standbys: test-ceph.xisjzf
+    mds: 1/1 daemons up, 1 standby
+    osd: 6 osds: 6 up (since 10s), 6 in (since 37s); 108 remapped pgs
+    rgw: 1 daemon active (1 hosts, 1 zones)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   8 pools, 305 pgs
+    objects: 99.79k objects, 6.9 GiB
+    usage:   15 GiB used, 105 GiB / 120 GiB avail
+    pgs:     0.328% pgs not active
+             260/199574 objects degraded (0.130%)
+             69108/199574 objects misplaced (34.628%)
+             183 active+clean
+             109 active+remapped+backfill_wait
+             6   active+recovery_wait+undersized+degraded+remapped
+             3   active+recovery_wait+degraded
+             1   active+undersized+remapped
+             1   active+recovering+undersized+remapped
+             1   active+recovery_wait
+             1   peering
+ 
+  io:
+    client:   255 B/s rd, 0 op/s rd, 0 op/s wr
+    recovery: 1024 KiB/s, 773 keys/s, 49 objects/s
+ 
+root@test-ceph:/# ceph osd tree
+ID  CLASS  WEIGHT   TYPE NAME           STATUS  REWEIGHT  PRI-AFF
+-1         0.11691  root default                                 
+-3         0.11691      host test-ceph                           
+ 0    hdd  0.01949          osd.0           up   1.00000  1.00000
+ 1    hdd  0.01949          osd.1           up   1.00000  1.00000
+ 2    hdd  0.01949          osd.2           up   1.00000  1.00000
+ 3    hdd  0.01949          osd.3           up   1.00000  1.00000
+ 4    hdd  0.01949          osd.4           up   1.00000  1.00000
+ 5    hdd  0.01949          osd.5           up   1.00000  1.00000 
+<crash>
+
+probleem:
+
+[ 2860.772147] Out of memory: Killed process 20079 (ceph-osd) total-vm:1129228kB, anon-rss:547860kB, file-rss:204kB, shmem-rss:0kB, UID:167 pgtables:1560kB oom_score_adj:0
+
+<herstart>
+
+root@test-ceph:/# ceph crash ls
+ID                                                                ENTITY  NEW  
+2026-05-16T08:16:53.031497Z_abe2988c-3e70-484f-ba5f-1bb8aa54a05a  osd.5    *   
+root@test-ceph:/# ceph crash archive 2026-05-16T08:16:53.031497Z_abe2988c-3e70-484f-ba5f-1bb8aa54a05a
+root@test-ceph:/# ceph -s
+  cluster:
+    id:     76623c89-407e-11f1-8b9f-bc2411e1209d
+    health: HEALTH_WARN
+            3 OSD(s) experiencing slow operations in BlueStore
+ 
+  services:
+    mon: 1 daemons, quorum test-ceph (age 2h)
+    mgr: test-ceph.xisjzf(active, since 76m), standbys: test-ceph.lizbah
+    mds: 1/1 daemons up, 1 standby
+    osd: 6 osds: 6 up (since 51m), 6 in (since 2h)
+    rgw: 1 daemon active (1 hosts, 1 zones)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   8 pools, 305 pgs
+    objects: 99.80k objects, 6.9 GiB
+    usage:   15 GiB used, 105 GiB / 120 GiB avail
+    pgs:     305 active+clean
+ 
+  io:
+    client:   89 B/s rd, 0 op/s rd, 0 op/s wr
+ 
+root@test-ceph:/# ceph health detail
+HEALTH_WARN 3 OSD(s) experiencing slow operations in BlueStore
+[WRN] BLUESTORE_SLOW_OP_ALERT: 3 OSD(s) experiencing slow operations in BlueStore
+     osd.1 observed slow operation indications in BlueStore
+     osd.2 observed slow operation indications in BlueStore
+     osd.3 observed slow operation indications in BlueStore
+
+root@test-ceph:/# ceph osd perf
+osd  commit_latency(ms)  apply_latency(ms)
+  1                   0                  0
+  5                   0                  0
+  4                   0                  0
+  3                   0                  0
+  2                   0                  0
+  0                   0                  0
+
+root@test-ceph:/# ceph osd set nodeep-scrub
+nodeep-scrub is set
+probleem: te veel osd’s, te weinig geheugen.
+
+lets remove some osd’s:
+
+root@test-ceph:/# ceph osd out 5
+marked out osd.5. 
+
+root@test-ceph:/# ceph -s
+  cluster:
+    id:     76623c89-407e-11f1-8b9f-bc2411e1209d
+    health: HEALTH_WARN
+            3 OSD(s) experiencing slow operations in BlueStore
+            nodeep-scrub flag(s) set
+            Slow OSD heartbeats on back (longest 34040.892ms)
+            Slow OSD heartbeats on front (longest 34040.918ms)
+ 
+  services:
+    mon: 1 daemons, quorum test-ceph (age 2h)
+    mgr: test-ceph.xisjzf(active, since 78s), standbys: test-ceph.lizbah
+    mds: 1/1 daemons up, 1 standby
+    osd: 6 osds: 6 up (since 64s), 5 in (since 10m); 6 remapped pgs
+         flags nodeep-scrub
+    rgw: 1 daemon active (1 hosts, 1 zones)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   8 pools, 305 pgs
+    objects: 99.81k objects, 6.9 GiB
+    usage:   15 GiB used, 85 GiB / 100 GiB avail
+    pgs:     2239/199624 objects misplaced (1.122%)
+             299 active+clean
+             4   active+remapped+backfill_wait
+             2   active+remapped+backfilling
+ 
+  io:
+    client:   84 B/s rd, 0 op/s rd, 0 op/s wr
+    recovery: 5.4 MiB/s, 66 objects/s
+
+root@test-ceph:/# ceph osd status
+ID  HOST        USED  AVAIL  WR OPS  WR DATA  RD OPS  RD DATA  STATE      
+ 0  test-ceph  2969M  17.0G      0        0       0        0   exists,up  
+ 1  test-ceph  3036M  17.0G      0        0       0        0   exists,up  
+ 2  test-ceph  2870M  17.1G      0        0       0        0   exists,up  
+ 3  test-ceph  3174M  16.8G      0        0       0        0   exists,up  
+ 4  test-ceph  3288M  16.7G      0        0       1        3   exists,up  
+ 5  test-ceph     0      0       0        0       0        0   exists,up  
+
+root@test-ceph:/# ceph osd crush remove osd.5
+removed item id 5 name 'osd.5' from crush map
+
+root@test-ceph:/# ceph auth del osd.5
+
+root@test-ceph:/# ceph osd rm 5
+
+(herhaal voor osd 4 en osd 3)
+
+lesson learned: niet teveel osd aan een ceph bakje hangen met te weinig geheugen.
