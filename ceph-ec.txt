@@ -1,0 +1,74 @@
+eate a cephfs with erasure-coding pool:
+
+[root@ceph-osd-0 ger]# ceph osd erasure-code-profile ls
+default
+isa_2_2
+isa_4_2
+
+create 'normal' metadata-pool:
+
+[root@ceph-osd-0 ger]# ceph osd pool create rdms-poc-ec_metadata
+pool 'rdms-poc-ec_metadata' created
+
+create ec data-pool:
+
+[root@ceph-osd-0 ger]# ceph osd pool create rdms-poc-ec_data erasure isa_2_2
+pool 'rdms-poc-ec_data' created
+
+create filesystem:
+
+[root@ceph-osd-0 ger]# ceph fs new rdms-poc-ec rdms-poc-ec_metadata rdms-poc-ec_data
+Error EINVAL: pool 'rdms-poc-ec_data' (id '26') is an erasure-coded pool. Use of an EC pool for the default data pool is discouraged; see the online CephFS documentation for more information. Use --force to override.
+
+set allopw-ec-overwrite to true:
+
+[root@ceph-osd-0 ger]# ceph osd pool set rdms-poc-ec_data allow_ec_overwrites true
+set pool 26 allow_ec_overwrites to true
+
+create filesystem poging 2:
+
+[root@ceph-osd-0 ger]# ceph fs new rdms-poc-ec rdms-poc-ec_metadata rdms-poc-ec_data --force
+  Pool 'rdms-poc-ec_data' (id '26') has pg autoscale mode 'on' but is not marked as bulk.
+  Consider setting the flag by running
+    # ceph osd pool set rdms-poc-ec_data bulk true
+new fs with metadata pool 25 and data pool 26
+
+check status:
+
+[root@ceph-osd-0 ger]# ceph fs status
+rdms-poc - 1 clients
+========
+RANK  STATE                MDS                   ACTIVITY     DNS    INOS   DIRS   CAPS
+ 0    active  ceph-osd-1.woodlark.hpc.rug.nl  Reqs:    0 /s    22     24     16      1
+       POOL          TYPE     USED  AVAIL
+  rdms-poc_data    metadata   491M   138T
+rdms-poc_metadata    data    71.2G   138T
+rdms-poc-ec - 0 clients
+===========
+RANK  STATE                MDS                   ACTIVITY     DNS    INOS   DIRS   CAPS
+ 0    active  ceph-osd-2.woodlark.hpc.rug.nl  Reqs:    0 /s    10     13     12      0
+        POOL            TYPE     USED  AVAIL
+rdms-poc-ec_metadata  metadata  40.0k   138T
+  rdms-poc-ec_data      data       0    207T
+         STANDBY MDS
+ceph-osd-0.woodlark.hpc.rug.nl
+MDS version: ceph version 19.2.3 (c92aebb279828e9c3c1f5d24613efca272649e62) squid (stable)
+
+create keyring for new filesystem:
+
+ceph auth get-or-create client.rdms-poc-ec \
+  mds 'allow rw fsname=rdms-poc-ec' \
+  osd 'allow rw pool=rdms-poc-ec_data, allow rw pool=rdms-poc-ec_metadata' \
+  mon 'allow r fsname=rdms-poc-ec' \
+  -o /etc/ceph/ceph.client.rdms-poc-ec.keyring
+
+copy /etc/ceph/ceph.client.rdms-poc-ec.keyring to client
+
+mount on client:
+
+root@rdms-ceph-poc01:/etc/ceph# mount -t ceph [2001:610:1a09:dce:513:0:2:1]:6789,[2001:610:1a09:dce:513:0:2:2]:6789:/ /mnt/cephfs-ec -o name=rdms-poc-ec,fs=rdms-poc-ec
+
+root@rdms-ceph-poc01:/etc/ceph# df -h
+Filesystem                                                               Size  Used Avail Use% Mounted on
+[2001:610:1a09:dce:513:0:2:1]:6789,[2001:610:1a09:dce:513:0:2:2]:6789:/  139T   24G  139T   1% /mnt/cephfs
+[2001:610:1a09:dce:513:0:2:1]:6789,[2001:610:1a09:dce:513:0:2:2]:6789:/  208T     0  208T   0% /mnt/cephfs-ec
