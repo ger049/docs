@@ -1,3 +1,11 @@
+install victron-mcp:
+
+% claude mcp add --transport stdio victron-tcp -- npx victron-tcp
+
+% claude mcp list
+victron-tcp: npx victron-tcp - ✓ Connected
+
+
 gerstrikwerda@RN-145-90-182-169 batterij % claude                  
 ╭─── Claude Code v2.1.144 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 ╭─── Claude Code v2.1.144 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
