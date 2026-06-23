@@ -1,0 +1,30 @@
+setting up woodlark openstack-cli
+
+gerstrikwerda@WKS053971 ~ % python3 -m venv ~/openstack-env
+gerstrikwerda@WKS053971 ~ % source ~/openstack-env/bin/activate
+(openstack-env) gerstrikwerda@WKS053971 ~ % pip install --upgrade pip
+Requirement already satisfied: pip in ./openstack-env/lib/python3.14/site-packages (26.1.2)
+WARNING: Cache entry deserialization failed, entry ignored
+(openstack-env) gerstrikwerda@WKS053971 ~ % pip install python-openstackclient
+
+get clouds.yaml from webinterface
+
+(openstack-env) gerstrikwerda@WKS053971 Downloads % cp ./clouds.yaml ../.config/openstack/clouds.yaml 
+
+(openstack-env) gerstrikwerda@WKS053971 ~ % export OS_CLOUD=woodlark                         
+
+(openstack-env) gerstrikwerda@WKS053971 ~ % openstack server list --all
++--------------------------------------+------------------------+--------+--------------------------------------------+--------------------------+------------------+----------------------------------+
+| ID                                   | Name                   | Status | Networks                                   | Image                    | Flavor           | Project ID                       |
++--------------------------------------+------------------------+--------+--------------------------------------------+--------------------------+------------------+----------------------------------+
+| 52d93cd0-5c6e-4cf7-86b8-6f0b6179cc0b | r-bakje-0              | ACTIVE | aurel-v4-net=10.0.1.130;                   | N/A (booted from volume) | gen.v2.vm-2-2    | 8fff6b66606946ffac64cba4e226695a |
+|                                      |                        |        | aurel-v6-net=2001:610:1a09:dce:c4c4::11fd  |                          |                  |                                  |
+| dc6a3120-745c-47e1-91ad-a3441ce96ca3 | speeltuin-0            | ACTIVE | steven-v4-net=10.0.4.0;                    | N/A (booted from volume) | gen.v2.vm-48-48  | c53e2ab18d7d496894048a7d8b61cd4e |
+|                                      |                        |        | steven-v6-net=2001:610:1a09:dce:c4c4::3d6  |                          |                  |                                  |
+| d4c61b64-0722-473b-9a40-c1a728fce43b | jumpie-mac-jumpface2-0 | ACTIVE | steven-v4-net=10.0.1.101, 145.100.235.226; | N/A (booted from volume) | gen.v2.vm-4-4    | c53e2ab18d7d496894048a7d8b61cd4e |
+|                                      |                        |        | steven-v6-net=2001:610:1a09:dce:c4c4::29c  |                          |                  |                                  |
+| 13a0f9c3-a6c4-4a4c-87eb-736593050d90 | nethek                 | ACTIVE | netheknet=10.0.0.6, 145.100.235.214        | N/A (booted from volume) | gen.v2.vm-4-4    | a46343ec354f46a68530d2c6c41ae768 |
+| ee8d2d20-9941-48b6-a5f4-93e6a2a70565 | goldcrest-api-0        | ACTIVE | aurel-v4-net=10.0.0.208, 145.100.235.75;   | N/A (booted from volume) | aurel-needs-this | 8fff6b66606946ffac64cba4e226695a |
+|                                      |                        |        | aurel-v6-net=2001:610:1a09:dce:c4c4::135f  |                          |                  |                                  |
++--------------------------------------+------------------------+--------+--------------------------------------------+--------------------------+------------------+----------------------------------+
+
