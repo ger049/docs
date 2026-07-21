@@ -1,0 +1,68 @@
+ceph block-storage:
+
+root@ceph-test:/# ceph osd pool create rbd-pool      
+pool 'rbd-pool' created
+
+root@ceph-test:/# rbd pool init rbd-pool
+
+root@ceph-test:/# ceph osd pool stats
+
+pool rbd-pool id 10
+  nothing is going on
+
+root@ceph-test:/# rbd create rbd-pool/volume01 --size 10G
+
+root@ceph-test:/# rbd ls rbd-pool
+volume01
+
+root@ceph-test:/# rbd info rbd-pool/volume01
+rbd image 'volume01':
+	size 10 GiB in 2560 objects
+	order 22 (4 MiB objects)
+	snapshot_count: 0
+	id: c531951b862b
+	block_name_prefix: rbd_data.c531951b862b
+	format: 2
+	features: layering, exclusive-lock, object-map, fast-diff, deep-flatten
+	op_features: 
+	flags: 
+	create_timestamp: Tue Jul 21 08:56:20 2026
+	access_timestamp: Tue Jul 21 08:56:20 2026
+	modify_timestamp: Tue Jul 21 08:56:20 2026
+
+set extra permissions:
+
+root@ceph-test:/# ceph auth caps client.ger  mon 'allow r'  mds 'allow rw fsname=cephfs01'  osd 'allow rw tag cephfs data=cephfs01, allow rwx pool=rbd-pool'  mgr 'profile rbd pool=rbd-pool'
+[client.ger]
+	key = AQDhgltqkE8zBRAA1g9VO/EBRwJapJ3R2NHQCw==
+	caps mds = "allow rw fsname=cephfs01"
+	caps mgr = "profile rbd pool=rbd-pool"
+	caps mon = "allow r"
+	caps osd = "allow rw tag cephfs data=cephfs01, allow rwx pool=rbd-pool"
+updated caps for client.ger
+
+on ceph-client:
+
+root@test-client:/home/ger# rbd map rbd-pool/volume01 --name client.ger --keyring /etc/ceph/ceph.client.ger.keyring 
+/dev/rbd0
+
+root@test-client:/home/ger# mkfs.xfs /dev/rbd0 
+meta-data=/dev/rbd0              isize=512    agcount=16, agsize=163840 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=1
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=0
+data     =                       bsize=4096   blocks=2621440, imaxpct=25
+         =                       sunit=16     swidth=16 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=16384, version=2
+         =                       sectsz=512   sunit=16 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+Discarding blocks...Done.
+
+root@test-client:/home/ger# mkdir /mnt/ceph-block
+
+root@test-client:/home/ger# mount /dev/rbd0 /mnt/ceph-block/
+
+root@test-client:/home/ger# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/rbd0        10G  228M  9.8G   3% /mnt/ceph-block

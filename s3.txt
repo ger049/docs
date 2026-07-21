@@ -24,6 +24,26 @@ root@ceph-test:/# radosgw-admin user create --uid=ger --display-name="Ger S3 tes
             "create_date": "2026-07-18T13:59:07.960709Z"
         }
     ],
+
+# check capacity:
+
+root@ceph-test:/# ceph df
+--- RAW STORAGE ---
+CLASS    SIZE   AVAIL     USED  RAW USED  %RAW USED
+hdd    60 GiB  57 GiB  3.1 GiB   3.1 GiB       5.10
+TOTAL  60 GiB  57 GiB  3.1 GiB   3.1 GiB       5.10
+ 
+--- POOLS ---
+POOL                       ID  PGS   STORED  OBJECTS     USED  %USED  MAX AVAIL
+.mgr                        1    1  577 KiB        2  1.1 MiB      0     27 GiB
+cephfs.cephfs01.meta        2   16  6.6 KiB       22   67 KiB      0     27 GiB
+cephfs.cephfs01.data        3  128      0 B        0      0 B      0     27 GiB
+.rgw.root                   4   32  1.6 KiB        6   48 KiB      0     27 GiB
+default.rgw.log             5   32  3.6 KiB      210  272 KiB      0     27 GiB
+default.rgw.control         6   32      0 B        8      0 B      0     27 GiB
+default.rgw.meta            7   32  1.9 KiB       10   64 KiB      0     27 GiB
+default.rgw.buckets.index   8   32  1.1 MiB       22  2.2 MiB      0     27 GiB
+default.rgw.buckets.data    9   64  553 MiB   20.89k  1.2 GiB   2.15     27 GiB
     
 
 # install aws-cli
