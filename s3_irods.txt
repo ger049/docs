@@ -1,0 +1,10 @@
+S3 woodlark irods-resc on store-dev:
+
+# /var/lib/irods/s3.keypair 
+
+echo "ACCESS_KEY_ID SECRET_ACCESS_KEY" > /var/lib/irods/s3.keypair 
+
+chown irods:irods /var/lib/irods/s3.keypair 
+chmod 600 /var/lib/irods/s3.keypair
+
+iadmin mkresc s3resc store-dev.data.rug.nl woodlark-s3:/rdms-test/store-dev \ "S3_DEFAULT_HOSTNAME=https://rados-gateway.woodlark.hpc.rug.nl;\ S3_AUTH_FILE=/var/lib/irods/s3-woodlark.keypair;\ S3_REGIONNAME=eu-central-1;\ S3_RETRY_COUNT=3;\ S3_WAIT_TIME_SECONDS=3;\ S3_PROTO=HTTPS;\ HOST_MODE=cacheless_attached"
