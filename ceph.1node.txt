@@ -1,0 +1,71 @@
+install cephadm:
+
+# apt install -y cephadm
+
+bootstrap ceph:
+
+# cephadm bootstrap --mon-ip <jouw-node-ip> --single-host-defaults
+
+Ceph Dashboard is now available at:
+
+	     URL: https://ceph-test:8443/
+	    User: admin
+	Password: zhudjxr1gg
+
+Enabling client.admin keyring and conf on hosts with "admin" label
+Saving cluster configuration to /var/lib/ceph/4b8c1bfe-8292-11f1-8ab0-bc241134ded7/config directory
+You can access the Ceph CLI as following in case of multi-cluster or non-default config:
+
+	sudo /usr/sbin/cephadm shell --fsid 4b8c1bfe-8292-11f1-8ab0-bc241134ded7 -c /etc/ceph/ceph.conf -k /etc/ceph/ceph.client.admin.keyring
+
+Or, if you are only running a single cluster on this host:
+
+	sudo /usr/sbin/cephadm shell 
+
+Please consider enabling telemetry to help improve Ceph:
+
+	ceph telemetry on
+
+For more information see:
+
+	https://docs.ceph.com/en/latest/mgr/telemetry/
+
+configure ceph to replicate on osd-level, not on host-level (because only 1 node):
+
+# cephadm shell
+# ceph config set global osd_crush_chooseleaf_type 0
+
+add osd’s:
+
+root@ceph-test:/# ceph orch daemon add osd ceph-test:/dev/sdb
+Created osd(s) 0 on host 'ceph-test'
+root@ceph-test:/# ceph orch daemon add osd ceph-test:/dev/sdc
+Created osd(s) 1 on host 'ceph-test'
+root@ceph-test:/# ceph orch daemon add osd ceph-test:/dev/sdd
+Created osd(s) 2 on host 'ceph-test'
+
+check
+
+root@ceph-test:/# ceph -s
+  cluster:
+    id:     4b8c1bfe-8292-11f1-8ab0-bc241134ded7
+    health: HEALTH_OK
+ 
+  services:
+    mon: 1 daemons, quorum ceph-test (age 3m)
+    mgr: ceph-test.mhqzry(active, since 3m), standbys: ceph-test.oppfrm
+    osd: 3 osds: 3 up (since 21s), 3 in (since 34s)
+ 
+  data:
+    pools:   1 pools, 1 pgs
+    objects: 2 objects, 577 KiB
+    usage:   480 MiB used, 60 GiB / 60 GiB avail
+    pgs:     1 active+clean
+ 
+root@ceph-test:/# ceph osd tree
+ID  CLASS  WEIGHT   TYPE NAME           STATUS  REWEIGHT  PRI-AFF
+-1         0.05846  root default                                 
+-3         0.05846      host ceph-test                           
+ 0    hdd  0.01949          osd.0           up   1.00000  1.00000
+ 1    hdd  0.01949          osd.1           up   1.00000  1.00000
+ 2    hdd  0.01949          osd.2           up   1.00000  1.00000

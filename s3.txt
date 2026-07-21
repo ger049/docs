@@ -1,0 +1,77 @@
+ceph s3:
+
+root@ceph-test:/# ceph orch apply rgw s3 --placement="1 ceph-test"
+Scheduled rgw.s3 update...
+
+root@ceph-test:/# ceph orch ps --daemon-type rgw
+NAME                     HOST       PORTS  STATUS         REFRESHED  AGE  MEM USE  MEM LIM  VERSION  IMAGE ID      CONTAINER ID  
+rgw.s3.ceph-test.sqwtmd  ceph-test  *:80   running (13s)    11s ago  13s    13.1M        -  19.2.5   6e6a6af2ea75  ad88eb335331
+
+root@ceph-test:/# radosgw-admin user create --uid=ger --display-name="Ger S3 test"
+{
+    "user_id": "ger",
+    "display_name": "Ger S3 test",
+    "email": "",
+    "suspended": 0,
+    "max_buckets": 1000,
+    "subusers": [],
+    "keys": [
+        {
+            "user": "ger",
+            "access_key": “access”,
+            "secret_key": “secret” ,
+            "active": true,
+            "create_date": "2026-07-18T13:59:07.960709Z"
+        }
+    ],
+    
+
+# install aws-cli
+
+brew install awscli
+
+# confgure aws S3:
+
+vi .aws/config
+
+[default]
+region = default
+
+[profile ceph-test]
+region = default
+endpoint_url = http://ceph-test
+
+vi .aws/credentials
+
+[ceph-test]
+aws_access_key_id = access
+aws_secret_access_key = secret
+
+create S3 bucket:
+
+gerstrikwerda@WKS053971 ~ % aws s3 mb s3://ger-bucket/ --profile ceph-test
+make_bucket: ger-bucket
+
+rclone
+
+install rclone:
+
+$ brew install rclone
+
+config rclone:
+
+$ vi .config/rclone/rclone.conf:
+
+[ceph-test]
+type = s3
+provider = Ceph
+access_key_id = access
+secret_access_key = secret
+endpoint = http://ceph-test:80
+region = default
+
+copy example:
+
+gerstrikwerda@WKS053971 docs_old % rclone copy ./lustre.tips ceph-test:/ger-bucket/
+gerstrikwerda@WKS053971 docs_old % rclone ls  ceph-test:/ger-bucket/
+     4251 lustre.tips
