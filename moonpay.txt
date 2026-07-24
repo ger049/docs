@@ -1,0 +1,165 @@
+moonpay:
+
+install: 
+
+npm install -g @moonpay/cli
+npm warn ERESOLVE overriding peer dependency
+npm warn ERESOLVE overriding peer dependency
+npm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+added 372 packages in 15s
+
+71 packages are looking for funding
+  run `npm fund` for details
+npm warn install-scripts 6 packages had install scripts blocked because they are not covered by allowScripts:
+npm warn install-scripts   node-hid@3.4.0 (install: pkg-prebuilds-verify ./binding-options.js || node-gyp rebuild)
+npm warn install-scripts   usb@2.18.0 (install: node-gyp-build)
+npm warn install-scripts   bigint-buffer@1.1.5 (install: npm run rebuild || echo "Couldn't build bindings. Non-native version used.")
+npm warn install-scripts   bufferutil@4.1.0 (install: node-gyp-build)
+npm warn install-scripts   utf-8-validate@6.0.6 (install: node-gyp-build)
+npm warn install-scripts   utf-8-validate@5.0.10 (install: node-gyp-build)
+npm warn install-scripts
+npm warn install-scripts Run `npm install -g --allow-scripts=node-hid,usb,bigint-buffer,bufferutil,utf-8-validate,utf-8-validate` to allow these scripts once, or `npm config set allow-scripts=node-hid,usb,bigint-buffer,bufferutil,utf-8-validate,utf-8-validate --location=user` to allow them for all global installs.
+
+create account:
+
+mp login --email g.j.c.strikwerda@rug.nl
+
+By using this CLI, you agree to:
+  Terms of Use:      https://www.moonpay.com/en-gb/legal/terms_of_use_bvi_launchpad
+  Privacy Policy:    https://www.moonpay.com/legal/privacy_policy_launchpad
+  Swaps by:          https://swaps.xyz/terms
+
+email: g.j.c.strikwerda@rug.nl
+message: Open this link to verify:
+
+  https://agents.moonpay.com/login?email=g.j.c.strikwerda%40rug.nl
+verify account:
+
+% mp verify --email g.j.c.strikwerda@rug.nl --code xxx
+email: g.j.c.strikwerda@rug.nl
+message: Logged in successfully.
+
+create main wallet:
+
+gerstrikwerda@SURFnet-CIDR-90-145-invalid ~ % mp wallet create --name main
+name: main
+addresses:
+  solana: BV71D9C6ZvpPAp3ABi1dqv3cWi8BvPCQKvAa4BQDgTvB
+  solana-devnet: BV71D9C6ZvpPAp3ABi1dqv3cWi8BvPCQKvAa4BQDgTvB
+  ethereum: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  base: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  arbitrum: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  robinhood: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  polygon: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  optimism: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  bnb: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  bnb-testnet: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  avalanche: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  tempo: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  tempo-moderato: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  ethereum-sepolia: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  base-sepolia: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  arbitrum-sepolia: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  polygon-amoy: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  bitcoin: bc1qgwg5k7ml5zfvxslelxx2lhxn8jhza4lxtf2w9n
+  tron: TQhczXSYkXVZKeavAPxR5fcbjcEafJ5DMe
+  ton: UQBTQQX_54NAVb2TyEBM3DvGUVgq-G8dG5yG5667HWkGKlA4
+  filecoin: f1kbhqcggwz6xtqinijommxeulrjbjklun5br7roy
+
+backup credentials:
+
+% cp  .config/moonpay/credentials.json ~/backup.moonpay.crds
+
+install moonpay skill/mcp:
+
+gerstrikwerda@SURFnet-CIDR-90-145-invalid ~ % mp skill install
+- name: moonpay-auth
+  installed: true
+
+- name: moonpay-block-explorer
+  installed: true
+
+- name: moonpay-buy-crypto
+  installed: true
+
+- name: moonpay-buy-the-dip
+  installed: true
+
+- name: moonpay-card-checkout
+  installed: true
+
+- name: moonpay-card-onboarding
+  installed: true
+
+- name: moonpay-check-wallet
+  installed: true
+
+- name: moonpay-commerce
+  installed: true
+
+- name: moonpay-deposit
+  installed: true
+
+- name: moonpay-discover-tokens
+  installed: true
+
+- name: moonpay-export-data
+  installed: true
+
+- name: moonpay-feedback
+  installed: true
+
+- name: moonpay-fund-polymarket
+  installed: true
+
+- name: moonpay-hardware-wallet
+  installed: true
+
+- name: moonpay-kalshi
+  installed: true
+
+- name: moonpay-mcp
+  installed: true
+
+- name: moonpay-missions
+  installed: true
+
+- name: moonpay-polymarket
+  installed: true
+
+- name: moonpay-polymarket-feeds
+  installed: true
+
+- name: moonpay-polymarket-strategy
+  installed: true
+
+- name: moonpay-portfolio
+  installed: true
+
+- name: moonpay-prediction-market
+  installed: true
+
+- name: moonpay-price-alerts
+  installed: true
+
+- name: moonpay-swap-tokens
+  installed: true
+
+- name: moonpay-take-profit-ladder
+  installed: true
+
+- name: moonpay-trading-automation
+  installed: true
+
+- name: moonpay-trailing-stop
+  installed: true
+
+- name: moonpay-upgrade
+  installed: true
+
+- name: moonpay-virtual-account
+  installed: true
+
+- name: moonpay-x402
+  installed: true
