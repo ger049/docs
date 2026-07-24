@@ -163,3 +163,28 @@ gerstrikwerda@SURFnet-CIDR-90-145-invalid ~ % mp skill install
 
 - name: moonpay-x402
   installed: true
+
+Add MCP to claude_desktop_config.json:
+
+{
+    "mcpServers": {
+    "moonpay": {
+    "command": "mp",
+    "args": ["mcp"]
+    }
+  }
+}
+
+Restart claude
+
+Test: 
+
+
+❯ what is my SOL wallet address?                                                                                                                   
+
+  Called moonpay (ctrl+o to expand)
+  
+⏺ Your Solana wallet address (wallet "main") is:
+
+  BV71D9C6ZvpPAp3ABi1dqv3cWi8BvPCQKvAa4BQDgTvB
+
