@@ -71,6 +71,10 @@ backup credentials:
 
 % cp  .config/moonpay/credentials.json ~/backup.moonpay.crds
 
+add project-level mcp:
+
+ger@test-client:~/project$ claude mcp add --scope project moonpay -- mp mcp
+
 install moonpay skill/mcp:
 
 gerstrikwerda@SURFnet-CIDR-90-145-invalid ~ % mp skill install
@@ -188,3 +192,41 @@ Test:
 
   BV71D9C6ZvpPAp3ABi1dqv3cWi8BvPCQKvAa4BQDgTvB
 
+bestaande moonpay wallet importeren:
+
+op bestaande moonpay omgeving:
+
+export private key/seed van bestaande moonpay wallet:
+
+% mp wallet export --wallet main  
+
+Mnemonic for "main":
+
+12 woorden..
+
+op nieuwe omgeving bestaande moonpay wallet importeren:
+
+ger@test-client:~$ mp wallet import --name main
+Paste your mnemonic or private key (hidden): 
+
+name: main
+type: hd
+addresses:
+  solana: BV71D9C6ZvpPAp3ABi1dqv3cWi8BvPCQKvAa4BQDgTvB
+  ethereum: 0x372aC27eC6124eA139eA685cCC5CeA630Ff6FE32
+  bitcoin: bc1qgwg5k7ml5zfvxslelxx2lhxn8jhza4lxtf2w9n
+  tron: TQhczXSYkXVZKeavAPxR5fcbjcEafJ5DMe
+  ton: UQBTQQX_54NAVb2TyEBM3DvGUVgq-G8dG5yG5667HWkGKlA4
+  filecoin: f1kbhqcggwz6xtqinijommxeulrjbjklun5br7roy
+
+ger@test-client:~$ mp token balance list --wallet main --chain solana
+- address: So11111111111111111111111111111111111111111
+  name: Solana
+  symbol: SOL
+  image: https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png
+  chain: solana
+  decimals: 9
+  balance:
+    amount: 0.100001
+    value: 7.3878978738299566
+    price: 73.8782399559
