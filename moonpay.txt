@@ -71,6 +71,10 @@ backup credentials:
 
 % cp  .config/moonpay/credentials.json ~/backup.moonpay.crds
 
+add project-level mcp:
+
+ger@test-client:~/project$ claude mcp add --scope project moonpay -- mp mcp
+
 install moonpay skill/mcp:
 
 gerstrikwerda@SURFnet-CIDR-90-145-invalid ~ % mp skill install
