@@ -1,0 +1,39 @@
+install wavespeed:
+
+setup python-env:
+
+% python3 -m venv wavespeed
+
+ % source ~/wavespeed/bin/activate
+
+(wavespeed)  % pip install wavespeed-mcp 
+
+check:
+
+(wavespeed)  % which wavespeed-mcp       
+/Users/gerstrikwerda/wavespeed/bin/wavespeed-mcp
+
+enable/configure API-key on wavespeed.ai for MCP
+
+check json-config:
+
+% python3 -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.json
+
+multiple mcp’s:
+
+{
+  "mcpServers": {
+    "moonpay": {
+      "command": "mp",
+      "args": [
+        "mcp"
+      ]
+    },
+  "wavespeed": {
+      "command": "/Users/gerstrikwerda/wavespeed/bin/wavespeed-mcp",
+      "env": {
+        "WAVESPEED_API_KEY": "xxx"
+      }
+    }
+  },
+
