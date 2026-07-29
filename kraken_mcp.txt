@@ -1,0 +1,49 @@
+
+kraken mcp:
+
+gerstrikwerda@WKS053971 project % mkdir kraken 
+gerstrikwerda@WKS053971 project % cd kraken 
+gerstrikwerda@WKS053971 kraken % ls
+gerstrikwerda@WKS053971 kraken % curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/krakenfx/kraken-cli/releases/latest/download/kraken-cli-installer.sh | sh
+downloading kraken-cli 0.3.2 aarch64-apple-darwin
+installing to /Users/gerstrikwerda/.cargo/bin
+  kraken
+everything's installed!
+
+To add $HOME/.cargo/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.cargo/env (sh, bash, zsh)
+    source $HOME/.cargo/env.fish (fish)
+gerstrikwerda@WKS053971 kraken % source source $HOME/.cargo/env
+source: no such file or directory: source
+gerstrikwerda@WKS053971 kraken % source $HOME/.cargo/env 
+gerstrikwerda@WKS053971 kraken % kraken setup
+Kraken CLI Setup
+================
+
+This wizard will configure your Kraken API credentials.
+Your API secret will be stored in /Users/gerstrikwerda/Library/Application Support/kraken/config.toml (mode 0600).
+
+SECURITY NOTE: Never share your API secret. For automation, consider using
+environment variables (KRAKEN_API_KEY, KRAKEN_API_SECRET) instead of storing
+credentials on disk.
+
+Spot API Key: xxx
+Spot API Secret: [hidden]
+Configure Futures API credentials? no
+Default trading pair: BTCUSD
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Message                                                                                                  │
+╞══════════════════════════════════════════════════════════════════════════════════════════════════════════╡
+│ Setup complete! Credentials saved to /Users/gerstrikwerda/Library/Application Support/kraken/config.toml │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+gerstrikwerda@WKS053971 kraken % kraken mcp -s market
+kraken-cli MCP server v0.3.2 starting on stdio (10 tools, mode: guarded)
+
+mcp-config claude_desktop.json:
+
+ "kraken": {
+      "command": "kraken",
+      "args": ["mcp", "-s", "market,account,paper"]
+    }
