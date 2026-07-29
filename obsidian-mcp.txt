@@ -1,0 +1,16 @@
+install/configure obsidian vault (mac/telephone)
+
+install/configure local REST API in Obsidian App
+
+change/add to claude_desktop.json:
+
+"obsidian": {
+            "command": "npx",
+            "args": [
+                "mcp-remote@latest",
+                "http://127.0.0.1:27123/mcp/",
+                "--header",
+                "Authorization: Bearer xxx"
+            ]
+        }
+
