@@ -1,0 +1,58 @@
+fail2ban ssh:
+
+install fail2ban:
+
+# apt install fail2ban
+
+configure:
+
+root@test-client:/home/ger# vi /etc/fail2ban/jail.local
+
+[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+# whitelist your own IPs so you don't lock yourself out
+ignoreip = 127.0.0.1/8 ::1 <your-trusted-ip>
+
+[sshd]
+enabled = true
+port    = ssh          # or your custom port number
+backend  = systemd
+
+start/enable:
+
+root@test-client:/home/ger# systemctl enable --now fail2ban
+Synchronizing state of fail2ban.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable fail2ban
+
+check:
+
+root@test-client:/home/ger# fail2ban-client status sshd
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed:	0
+|  |- Total failed:	0
+|  `- Journal matches:	_SYSTEMD_UNIT=sshd.service + _COMM=sshd
+`- Actions
+   |- Currently banned:	0
+   |- Total banned:	0
+   `- Banned IP list:	
+
+
+nginx specifieke jail-settings:
+
+[nginx-http-auth]
+enabled  = true
+port     = http,https
+logpath  = /var/log/nginx/error.log
+
+[nginx-limit-req]
+enabled  = true
+port     = http,https
+logpath  = /var/log/nginx/error.log
+
+[nginx-botsearch]
+enabled  = true
+port     = http,https
+logpath  = /var/log/nginx/error.log
