@@ -1,0 +1,99 @@
+alert-manager:
+
+
+wget alertmanager-0.33.1.linux-amd64.tar.gz
+
+unzip 
+
+root@proxmox01:~/alert-manager/alertmanager-0.33.1.linux-amd64# ls -ltr
+total 76140
+-rw-r--r-- 1 1001 1001      311 Jul  4 21:30 NOTICE
+-rw-r--r-- 1 1001 1001    11357 Jul  4 21:30 LICENSE
+-rwxr-xr-x 1 1001 1001 29111636 Jul  4 21:30 amtool
+-rw-r--r-- 1 1001 1001      559 Jul  4 21:30 alertmanager.yml
+-rwxr-xr-x 1 1001 1001 48832272 Jul  4 21:30 alertmanager
+
+root@proxmox01:~/alert-manager/alertmanager-0.33.1.linux-amd64# cp ./alertmanager ./amtool /usr/local/bin/
+
+create user:
+
+sudo useradd --no-create-home --shell /usr/sbin/nologin alertmanager
+
+create dirs:
+
+sudo mkdir -p /etc/alertmanager /var/lib/alertmanager
+
+create systemd-config:
+
+[Unit]
+Description=Alertmanager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=alertmanager
+Group=alertmanager
+ExecStart=/usr/local/bin/alertmanager \
+  --config.file=/etc/alertmanager/alertmanager.yml \
+  --storage.path=/var/lib/alertmanager
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+create /etc/alertmananger/alertmanager.yml:
+
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: discord
+  group_by: ['alertname', 'instance']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: discord
+    discord_configs:
+      - webhook_url: 'https://discord.com/api/webhooks/xxx'
+        send_resolved: true
+
+start:
+
+# systemctl status alertmanager
+● alertmanager.service - Alertmanager
+     Loaded: loaded (/etc/systemd/system/alertmanager.service; disabled; preset: enabled)
+     Active: active (running) since Sun 2026-08-02 14:06:06 CEST; 3s ago
+ Invocation: 6566a863068247c0ab4ab8124e52617d
+   Main PID: 1083002 (alertmanager)
+      Tasks: 15 (limit: 16327)
+     Memory: 13.1M (peak: 13.5M)
+        CPU: 48ms
+     CGroup: /system.slice/alertmanager.service
+             └─1083002 /usr/local/bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --storage.path=/var/lib/alertmanager
+
+add to prometheus.yml:
+
+alerting: alertmanagers: 
+
+- static_configs: 
+      - targets: ['localhost:9093'] 
+         rule_files: - /etc/prometheus/rules/*.yml
+
+create rule-file:
+
+root@proxmox01:/usr/local/bin# cat /etc/prometheus/rules/instance.yml 
+groups:
+  - name: instance-availability
+    rules:
+      - alert: InstanceDown
+        expr: up{instance=~"test-client.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "{{ $labels.job }} op {{ $labels.instance }} reageert al {{ $value }}m niet (target down)."
+
+restart prometheus
