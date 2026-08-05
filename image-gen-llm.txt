@@ -1,0 +1,35 @@
+ge-generating LLM on a Mac M1 8 GB
+
+gerstrikwerda@WKS053971 project % mkdir image
+gerstrikwerda@WKS053971 project % history | grep python
+gerstrikwerda@WKS053971 project % cd image                  
+
+gerstrikwerda@WKS053971 image % python3 -m venv python-env
+gerstrikwerda@WKS053971 image % source python-env/bin/activate
+
+(python-env) gerstrikwerda@WKS053971 image % git clone https://github.com/ml-explore/mlx-examples.git
+Cloning into 'mlx-examples'...
+remote: Enumerating objects: 5087, done.
+remote: Counting objects: 100% (1426/1426), done.
+remote: Compressing objects: 100% (311/311), done.
+remote: Total 5087 (delta 1294), reused 1115 (delta 1115), pack-reused 3661 (from 4)
+Receiving objects: 100% (5087/5087), 53.20 MiB | 27.02 MiB/s, done.
+Resolving deltas: 100% (3488/3488), done.
+
+(python-env) gerstrikwerda@WKS053971 image % cd mlx-examples/stable_diffusion 
+(python-env) gerstrikwerda@WKS053971 stable_diffusion % pip install -r requirements.txt
+
+voorbeeld:
+
+(python-env) gerstrikwerda@WKS053971 stable_diffusion % python txt2image.py --n_images 1 -q -v \
+  --output still-life.png \
+  "A painting of a vase on a wooden table, dark background, still life."
+
+<wait..>
+
+Peak memory used for the unet: 4.559GB
+Peak memory used overall:      4.559GB
+(python-env) gerstrikwerda@WKS053971 stable_diffusion % ls -ltr
+total 2088
+
+-rw-r--r--   1 gerstrikwerda  staff  380604 Aug  5 16:18 still-life.png
