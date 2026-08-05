@@ -1,0 +1,122 @@
+loki/alloy:
+
+on grafana-server install loki:
+
+sudo apt update 
+sudo apt install -y gpg 
+sudo mkdir -p /etc/apt/keyrings/ 
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null 
+
+# Add repo echo 
+"deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+install loki:
+
+# apt install loki
+
+create chunks/rules dir:
+
+# mkdir /pool01/fs01/loki/chunks
+# mkdir /pool01/fs01/loki/rules 
+
+set perms
+
+set loki config:
+
+root@proxmox01:/pool01/fs01/loki# cat /etc/loki/config.yml 
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /var/lib/loki
+  storage:
+    filesystem:
+      chunks_directory: /pool01/fs01/loki/chunks
+      rules_directory: /pool01/fs01/loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2026-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+start loki:
+
+systemctl start loki
+
+on client install alloy:
+
+sudo apt update 
+sudo apt install -y gpg 
+sudo mkdir -p /etc/apt/keyrings/ 
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null 
+
+# Add repo echo 
+"deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+install alloy:
+
+# apt install alloy
+
+give alloy read to syslog:
+
+sudo usermod -aG systemd-journal alloy && sudo systemctl restart alloy
+
+create alloy-config:
+
+root@ceph-test:/home/ger# cat /etc/alloy/config.alloy 
+
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+}
+
+loki.source.journal "syslog" {
+  max_age       = "12h"
+  relabel_rules = loki.relabel.journal.rules
+  labels        = { job = "syslog", host = "<hostname>” }
+  forward_to    = [loki.write.proxmox01.receiver]
+}
+
+loki.write "proxmox01" {
+  endpoint {
+    url = "http://192.168.178.200:3100/loki/api/v1/push"
+  }
+}
+
+create rsyslog-conf to send syslog to alloy:
+
+root@ceph-test:/home/ger# cat /etc/rsyslog.d/60-alloy.conf 
+*.* action(type="omfwd" target="127.0.0.1" port="1514" protocol="tcp")
+
+start/enable alloy:
+
+# systemctl restart rsyslog
+# systemctl restart alloy
+# systemctl enable alloy
