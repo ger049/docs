@@ -1,0 +1,55 @@
+fastmcp for home-assistant:
+
+gerstrikwerda@WKS053971 ~ % export HOMEASSISTANT_URL=http://homeassistant.local:8123
+gerstrikwerda@WKS053971 ~ % export HOMEASSISTANT_TOKEN=$token-ha
+
+gerstrikwerda@WKS053971 ~ % uvx ha-mcp@latest                                       
+2026-08-30 13:45:37 ha_mcp.__main__ INFO: ha-mcp 8.4.0
+2026-08-30 13:45:37 httpx INFO: HTTP Request: GET https://pypi.org/pypi/ha-mcp/json "HTTP/1.1 200 OK"
+2026-08-30 13:45:37 ha_mcp.client.rest_client INFO: Initialized Home Assistant client for http://homeassistant.local:8123
+2026-08-30 13:45:38 ha_mcp.tools.registry INFO: Auto-discovery registered tools from 43 modules
+2026-08-30 13:45:38 ha_mcp.server INFO: Registered bundled skills as MCP resources
+2026-08-30 13:45:38 ha_mcp.server INFO: Registered ha_get_skill_guide (1 bundled skill(s))
+2026-08-30 13:45:38 ha_mcp.server INFO: Skill system summary: provider=ok, tool=ok, guidance_count=1
+2026-08-30 13:45:38 ha_mcp.settings_ui._tools_meta INFO: Disabled tools: ha_config_set_yaml
+2026-08-30 13:45:38 ha_mcp.server INFO: Applied persisted tool config (0 entries)
+2026-08-30 13:45:38 ha_mcp.server INFO: Search keyword enrichment applied (12 boosts)
+2026-08-30 13:45:38 ha_mcp.__main__ INFO: Tool metadata cache: 86 tools dumped, write succeeded
+2026-08-30 13:45:38 ha_mcp.stdio_settings_sidecar INFO: No responsive sidecar at the recorded URL (<urlopen error [Errno 61] Connection refused>); replacing state files only.
+2026-08-30 13:45:38 ha_mcp.stdio_settings_sidecar INFO: Spawned settings UI sidecar pid=77245 (log: /Users/gerstrikwerda/.ha-mcp/sidecar.log). URL written to /Users/gerstrikwerda/.ha-mcp/ui.url once ready.
+ha-mcp settings UI sidecar spawned (pid 77245). URL will be written to /Users/gerstrikwerda/.ha-mcp/ui.url
+2026-08-30 13:45:38 httpx INFO: HTTP Request: GET https://pypi.org/pypi/fastmcp/json "HTTP/1.1 200 OK"
+
+
+                           ╭──────────────────────────────────────────────────────────────────────────────╮                            
+                           │                                                                              │                            
+                           │                                                                              │                            
+                           │                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │                            
+                           │                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │                            
+                           │                                                                              │                            
+                           │                                                                              │                            
+                           │                                                                              │                            
+                           │                                FastMCP 3.4.7                                 │                            
+                           │                            https://gofastmcp.com                             │                            
+                           │                                                                              │                            
+                           │                  🖥  Server:      ha-mcp, 8.4.0                               │                            
+                           │                  🚀 Deploy free: https://horizon.prefect.io                  │                            
+                           │                                                                              │                            
+                           ╰──────────────────────────────────────────────────────────────────────────────╯                            
+
+
+[08/30/26 13:45:39] INFO     Starting MCP server 'ha-mcp' with transport 'stdio'                                       transport.py:241
+2026-08-30 13:45:39 ha_mcp.hacs_auto_refresh INFO: HACS auto-refresh: startup pass due (server 8.4.0); asking HACS for repository state
+2026-08-30 13:45:39 ha_mcp.client.websocket_client INFO: Connecting to Home Assistant WebSocket: ws://homeassistant.local:8123/api/websocket
+2026-08-30 13:45:39 ha_mcp.client.websocket_client INFO: WebSocket connected and authenticated successfully
+
+in claude_desktop_config.json:
+
+"Home Assistant": {
+      "command": "uvx",
+      "args": ["ha-mcp@latest"],
+      "env": {
+        "HOMEASSISTANT_URL": "http://homeassistant.local:8123",
+        "HOMEASSISTANT_TOKEN": "$token"
+      }
+    }
