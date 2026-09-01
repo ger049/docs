@@ -1,0 +1,35 @@
+change vm with opentofu without loosing current disk:
+
+- power down current vm
+- create snapshot
+- use the snapshot as image in name.tf:
+
+(openstack-env) gerstrikwerda@RN-145-90-181-112 opentofu % cat rdms-ger.tf
+module "openstack" {
+  source = "git::https://gitrepo.service.rug.nl/cit-hpc/tofu-openstack-cluster.git//module"
+
+  networks = {
+    ger-v4-net = { subnets = {
+      ger-v4-subnet = { cidr = "10.0.0.0/16", external = "external-v4", dns-nameservers = ["9.9.9.9"] }
+    }}
+    ger-v6-net = { subnets = {
+      ger-v6-subnet = { ip-version = 6, ipv6-address-mode = "dhcpv6-stateful", ipv6-ra-mode = "dhcpv6-stateful",
+        subnetpool = "external-v6-pool" , external = "external-v6", dns-nameservers = ["2620:fe::fe"] }
+    }}
+  }
+
+  security-groups = {
+    ger-sec-group = { rules = []}
+  }
+
+  default-security-groups = ["ger-sec-group"]
+
+  ssh-public-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJmWG8TpwHdU0DMEt6ItzwrV4cW4slwRAUWpaTgbCIor g.j.c.strikwerda@rug.nl"
+
+  instances = {
+      rdms-ceph-poc01   = { flavor = "gen.v2.vm-8-8", image = "snap-2", boot-volume = {size = 100},
+                      ports = {ger-v4-net = {floating-ip = true}, ger-v6-net = {}}}
+       rdms-ger  = { flavor = "gen.v2.vm-48-48", image = "debian-13", boot-volume = {size = 100},
+                      ports = {ger-v4-net = {floating-ip = true}, ger-v6-net = {}}}
+  }
+}
