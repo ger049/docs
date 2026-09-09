@@ -1,0 +1,61 @@
+inloggen op woodlark.hpc.rug.nl
+
+object-store -> container
+
+maak container (S3 bucket) aan
+
+in openstack cli: openstack ec2 credential create
+
+dat maakt je access/secret token aan
+
+apt install aws-cli
+
+aws-cli:
+
+gerstrikwerda@WKS053971 .aws % cat config
+[default]
+region = default
+
+[profile ceph-test]
+region = default
+endpoint_url = http://ceph-test
+
+[profile woodlark-ceph]
+region = default
+ca_bundle = /Users/gerstrikwerda/woodlark-ca.pem
+endpoint_url = https://rados-gateway.woodlark.hpc.rug.nl[12:10 PM]gerstrikwerda@WKS053971 .aws % cat credentials
+[ceph-test]
+aws_access_key_id = xxx
+aws_secret_access_key = xxx
+
+[woodlark-ceph]
+aws_access_key_id = xxx
+aws_secret_access_key = xxx
+
+gerstrikwerda@WKS053971 ~ % aws s3 ls s3://ger/data/ --profile woodlark-ceph --no-verify-ssl
+
+2026-07-20 15:20:27          0
+2026-07-20 15:21:28       7461 git.howto[12:14 PM]
+
+rclone config
+
+gerstrikwerda@WKS053971 ~ % cat .config/rclone/rclone.conf
+
+[test-ceph]
+type = s3
+provider = Ceph
+access_key_id = xxx
+secret_access_key = xxx
+endpoint = http://ceph-test:80
+region = default
+
+[woodlark]
+type = s3
+provider = Ceph
+access_key_id = xxx
+secret_access_key = xxx
+force_path_style = true
+endpoint = https://rados-gateway.woodlark.hpc.rug.nl
+
+gerstrikwerda@WKS053971 ~ % rclone ls woodlark:ger/data/
+     7461 git.howto

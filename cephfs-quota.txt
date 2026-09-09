@@ -1,0 +1,45 @@
+setting quota on dir on cephfs-mount:
+
+first run did not work:
+
+root@test-client:/mnt/cephfs01# setfattr -n ceph.quota.max_bytes -v 10G /mnt/cephfs01/ger/
+setfattr: /mnt/cephfs01/ger/: Permission denied
+
+check on ceph:
+
+root@ceph-test:/# ceph auth get client.ger
+[client.ger]
+	key = AQA2k5pqvE1DCBAAurbGnOqi02ZPsCAXAIbbDA==
+	caps mds = "allow rw fsname=cephfs01"
+	caps mon = "allow r fsname=cephfs01"
+	caps osd = "allow rw tag cephfs data=cephfs01"
+
+xattrs requires the p flag in the client's MDS caps.
+
+add extra:
+
+root@ceph-test:/# ceph auth caps client.ger \
+  mon 'allow r' \
+  mds 'allow rwp path=/ger' \
+  osd 'allow rw pool=cephfs01_data'
+[client.ger]
+	key = AQA2k5pqvE1DCBAAurbGnOqi02ZPsCAXAIbbDA==
+	caps mds = "allow rwp path=/ger"
+	caps mon = "allow r"
+	caps osd = "allow rw pool=cephfs01_data"
+updated caps for client.ger
+on client:
+
+root@test-client:/home/ger# mount -t ceph ceph-test:6789:/ger /mnt/cephfs01 -o name=ger,secretfile=/etc/ceph/ger.secret 
+
+root@test-client:/home/ger# df -h
+Filesystem                 Size  Used Avail Use% Mounted on
+192.168.178.114:6789:/ger   27G 1000M   26G   4% /mnt/cephfs01
+
+now you can set quota on cephfs:/dir/
+
+root@test-client:/home/ger# setfattr -n ceph.quota.max_bytes -v 10G /mnt/cephfs01/
+
+root@test-client:/home/ger# df -h
+Filesystem                 Size  Used Avail Use% Mounted on
+192.168.178.114:6789:/ger   10G 1000M  9.1G  10% /mnt/cephfs01
