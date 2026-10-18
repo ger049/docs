@@ -1,0 +1,78 @@
+Howto set up Salt
+
+set /etc/hosts:
+
+[root@dh-salt-master-0 almalinux]# cat /etc/hosts
+
+<ip-dh-master> dh-master
+<ip-dh-minion>  dh-minion01
+
+change openstack sec group to allow traffic from dh-minion to dh-master
+
+openstack security group rule create --ingress --protocol tcp  --dst-port 4505:4506 --remote-ip <dh-minion>/32 hpc-ger-sec-group
+
+install salt-master on dh-master:
+
+# curl -fsSL https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo | sudo tee /etc/yum.repos.d/salt.repo
+# dnf install salt-master
+# systemctl enable --now salt-master
+
+
+install salt-minion on dh-minion:
+
+# curl -fsSL https://github.com/saltstack/salt-install-guide/releases/latest/download/salt.repo | sudo tee /etc/yum.repos.d/salt.repo
+# dnf install salt-minion
+
+install configure minion:
+
+# echo "master: dh-master" | sudo tee /etc/salt/minion.d/master.conf 
+# echo "dh-minion01" | sudo tee /etc/salt/minion_id 
+# systemctl enable --now salt-minion
+
+check unaccepted keys:
+
+[root@dh-salt-master-0 almalinux]# salt-key -L
+Accepted Keys:
+Denied Keys:
+Unaccepted Keys:
+dh-minion01
+Rejected Keys:
+
+fingerprint new salt-minion:
+
+[root@dh-salt-master-0 almalinux]# salt-key -f dh-minion01
+Unaccepted Keys:
+dh-minion01:  bc:64:5a:97:7f:da:af:89:ba:7a:9b:20:d2:eb:8e:cc:f0:9a:92:ab:8e:dd:e0:77:2b:ff:8e:08:5a:46:b3:60
+
+add new salt-minion:
+
+[root@dh-salt-master-0 almalinux]# salt-key -a dh-minion01
+The following keys are going to be accepted:
+Unaccepted Keys:
+dh-minion01
+Proceed? [n/Y] Y
+Key for minion dh-minion01 accepted.
+
+some tests:
+
+[root@dh-salt-master-0 almalinux]# salt '*' test.ping
+dh-minion01:
+    True
+
+[root@dh-salt-master-0 almalinux]# salt '*' grains.item os osrelease
+dh-minion01:
+    ----------
+    os:
+        AlmaLinux
+    osrelease:
+        9.8
+
+list OS updates:
+
+[root@dh-salt-master-0 almalinux]# salt '*' pkg.list_upgrades
+dh-minion01:
+    ----------
+    pcre2:
+        10.40-7.el9_8
+    pcre2-syntax:
+        10.40-7.el9_8
